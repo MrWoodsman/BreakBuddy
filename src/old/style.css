@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+}
+
+:root {
+    font-family: "Roboto", sans-serif;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    margin: 0px;
+    display: flex;
+    flex-direction: column;
+}
+
+.timers-container {
+    /* background: red; */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    text-align: center;
+    padding: 2rem 1rem;
+    border-bottom: 1px solid lightgray;
+}
+
+.main-content {
+    height: 100%;
+}
+
+.buttons-container-small {
+    padding: .5rem;
+    width: 100%;
+    display: flex;
+    gap: .5rem;
+}
+
+.action-buttons {
+    background: lightgray;
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+    height: 50px;
+    width: 100%;
+    padding: 1rem;
+    border-radius: .5rem;
+    border: none;
+    cursor: pointer;
+}
+
+.information-container {
+    padding: 1rem;
+    color: gray;
+    font-size: 1rem;
+}
+
+#startWorkBtn {
+    background: oklch(64.8% 0.2 131.684);
+}
+#startBreakBtn {
+    background: oklch(75% 0.183 55.934);
+}
+#stopWorkBtn {
+    background: oklch(63.7% 0.237 25.331);
+    aspect-ratio: 1 / 1;
+    
+    height: 50px;
+    width: 50px;
+    flex-shrink: 0;
+}
+#stopBreakBtn {
+    background: oklch(63.7% 0.237 25.331);
+}
+.time-to-break {
+    width: 100%;
+    text-align: center;
+    font-size: .8rem;
+}

@@ -1,0 +1,401 @@
+<body>
+  <head>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <div class="main-content">
+    <div class="timers-container">
+      <div class="main-timer">
+        <h2 style="font-size: .75rem; text-transform: uppercase; font-weight: 800;">Suma czasu</h2>
+        <h1 id="main-timer-display">00:00:00</h1>
+      </div>
+
+      <div class="session-timer" style="color: gray">
+        <h3 id="session-status-label" style="font-size: .75rem; text-transform: uppercase;">Nierozpoczęto</h3>
+        <p id="session-timer-display">00:00:00</p>
+      </div>
+    </div>
+    <div class="information-container">
+      <p>Kiedyś bedą tu statystyki</p>
+    </div>
+  </div>
+
+  <div class="time-to-break" id="timeToBreak"></div>
+
+  <div class="buttons-container">
+    <div class="buttons-container-small">
+      <button id="startWorkBtn" class="action-buttons">Rozpocznij Pracę</button>
+      <button id="startBreakBtn" class="action-buttons" style="display: none">
+        Zrób Przerwę
+      </button>
+      <button id="stopWorkBtn" class="action-buttons" style="display: none">
+        X
+      </button>
+      <button id="stopBreakBtn" class="action-buttons" style="display: none">
+        Zakończ Przerwę
+      </button>
+    </div>
+    <button
+      id="devClearBtn"
+      style="margin-top: 20px; background-color: #c0392b"
+    >
+      Wyczyść dzisiejsze dane (DEV)
+    </button>
+  </div>
+
+  <script src="./js/addOrUpdateDayData.js"></script>
+  <script>
+    // =================================================================
+    // GŁÓWNE ZMIENNE STANU I DANYCH
+    // =================================================================
+    let currentState = "IDLE";
+    let daysData = [];
+    let dayData = {};
+    let timerInterval = null;
+
+    // =================================================================
+    // REFERENCJE DO ELEMENTÓW UI
+    // =================================================================
+    const mainTimerDisplay = document.getElementById("main-timer-display");
+    const sessionStatusLabel = document.getElementById("session-status-label");
+    const sessionTimerDisplay = document.getElementById(
+      "session-timer-display"
+    );
+    const startWorkBtn = document.getElementById("startWorkBtn");
+    const startBreakBtn = document.getElementById("startBreakBtn");
+    const stopWorkBtn = document.getElementById("stopWorkBtn");
+    const stopBreakBtn = document.getElementById("stopBreakBtn");
+    const devClearBtn = document.getElementById("devClearBtn");
+
+    // =================================================================
+    // GŁÓWNA LOGIKA APLIKACJI
+    // =================================================================
+    const startWork = () => {
+      if (currentState === "WORKING") return;
+
+
+      currentState = "WORKING";
+
+      const newWorkInterval = {
+        startTime: Date.now(),
+        endTime: null,
+        duration: null,
+      };
+      if (
+        dayData.workData.length === 0 ||
+        dayData.workData[0]?.startTime === null
+      ) {
+        dayData.workData = [newWorkInterval];
+      } else {
+        dayData.workData.push(newWorkInterval);
+      }
+      clearInterval(timerInterval);
+      timerInterval = setInterval(updateTimers, 1000);
+      updateUI();
+    };
+    const startBreak = () => {
+      if (currentState !== "WORKING") return;
+      const activeWorkInterval = dayData.workData[dayData.workData.length - 1];
+      activeWorkInterval.endTime = Date.now();
+      activeWorkInterval.duration =
+        activeWorkInterval.endTime - activeWorkInterval.startTime;
+      currentState = "ON_BREAK";
+      const newBreakInterval = {
+        startTime: Date.now(),
+        endTime: null,
+        duration: null,
+      };
+      if (
+        dayData.breakData.length === 0 ||
+        dayData.breakData[0]?.startTime === null
+      ) {
+        dayData.breakData = [newBreakInterval];
+      } else {
+        dayData.breakData.push(newBreakInterval);
+      }
+      clearInterval(timerInterval);
+      timerInterval = setInterval(updateTimers, 1000);
+      updateUI();
+    };
+    const stopWork = () => {
+      if (currentState !== "WORKING") return;
+      const activeWorkInterval = dayData.workData[dayData.workData.length - 1];
+      activeWorkInterval.endTime = Date.now();
+      activeWorkInterval.duration =
+        activeWorkInterval.endTime - activeWorkInterval.startTime;
+      currentState = "IDLE";
+      clearInterval(timerInterval);
+      updateUI();
+      sessionTimerDisplay.textContent = "00:00:00";
+      updateTimers();
+    };
+    const stopBreak = () => {
+      if (currentState !== "ON_BREAK") return;
+      const activeBreakInterval =
+        dayData.breakData[dayData.breakData.length - 1];
+      activeBreakInterval.endTime = Date.now();
+      activeBreakInterval.duration =
+        activeBreakInterval.endTime - activeBreakInterval.startTime;
+      startWork();
+    };
+
+    // =================================================================
+    // FUNKCJE POMOCNICZE I UI
+    // =================================================================
+    const formatTime = (milliseconds, litery = false) => {
+        if (isNaN(milliseconds) || milliseconds < 0) {
+            return litery ? "0s" : "00:00:00";
+        }
+
+        // Używamy Math.floor, aby uniknąć błędów zaokrągleń
+        const totalSeconds = Math.floor(milliseconds / 1000);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+
+        // Logika dla formatu HH:MM:SS pozostaje bez zmian
+        if (!litery) {
+            return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+        }
+
+        // ✅ Tu jest nowa, dynamiczna logika dla formatu z literami
+        const parts = [];
+
+        if (hours > 0) {
+            parts.push(`${hours}h`);
+        }
+        if (minutes > 0) {
+            parts.push(`${minutes}m`);
+        }
+        
+        // Sekundy pokazujemy zawsze, jeśli czas jest krótszy niż minuta,
+        // lub jeśli nie są zerem.
+        if (seconds > 0 || parts.length === 0) {
+            parts.push(`${seconds}s`);
+        }
+
+        return parts.join(' ');
+    };
+    // ✅ ZMIENIONA LOGIKA, KTÓRA POPRAWNIE IGNORUJE CZAS W STANIE IDLE
+    const updateTimers = () => {
+      // --- Timer sesji (bez zmian) ---
+      let sessionStartTime;
+      if (currentState === "WORKING") {
+        sessionStartTime =
+          dayData.workData[dayData.workData.length - 1]?.startTime;
+      } else if (currentState === "ON_BREAK") {
+        sessionStartTime =
+          dayData.breakData[dayData.breakData.length - 1]?.startTime;
+      }
+      if (sessionStartTime) {
+        sessionTimerDisplay.textContent = formatTime(
+          Date.now() - sessionStartTime
+        );
+      }
+
+      // --- Główny timer (NOWA, POPRAWNA LOGIKA) ---
+
+      // Jeśli praca nigdy nie została rozpoczęta, timer powinien być 00:00:00
+      if (dayData.workData.length === 0) {
+        mainTimerDisplay.textContent = "00:00:00";
+        return;
+      }
+
+      // 1. Zsumuj czas trwania wszystkich ZAKOŃCZONYCH interwałów pracy i przerw.
+      const totalCompletedWork = dayData.workData.reduce(
+        (total, interval) => total + (interval.duration || 0),
+        0
+      );
+      const totalCompletedBreaks = dayData.breakData.reduce(
+        (total, interval) => total + (interval.duration || 0),
+        0
+      );
+
+      // To jest nasza podstawa - czas, który już na pewno został zaliczony.
+      let totalSessionTime = totalCompletedWork + totalCompletedBreaks;
+
+      // 2. Jeśli aplikacja jest w stanie aktywnym, dodaj czas bieżącej sesji.
+      if (currentState === "WORKING") {
+        const activeWorkInterval =
+          dayData.workData[dayData.workData.length - 1];
+        if (activeWorkInterval) {
+          totalSessionTime += Date.now() - activeWorkInterval.startTime;
+        }
+      } else if (currentState === "ON_BREAK") {
+        const activeBreakInterval =
+          dayData.breakData[dayData.breakData.length - 1];
+        if (activeBreakInterval) {
+          totalSessionTime += Date.now() - activeBreakInterval.startTime;
+        }
+      }
+      // 3. Wyświetl poprawnie obliczony czas.
+      mainTimerDisplay.textContent = formatTime(totalSessionTime);
+
+      // =================================================================
+    // ✅ NOWA LOGIKA DLA LICZNIKA "DO PRZERWY"
+    // =================================================================
+    const timeToBreakDisplay = document.getElementById("timeToBreak");
+    const workDurationForBreak = 2700000; // 45 minut w milisekundach
+
+    // Sprawdzaj czas do przerwy TYLKO, gdy stan to "WORKING"
+    if (currentState === "WORKING") {
+        // 1. Znajdź start bieżącej sesji pracy
+        const activeWorkInterval = dayData.workData[dayData.workData.length - 1];
+
+        if (activeWorkInterval && activeWorkInterval.startTime) {
+            // 2. Oblicz, kiedy powinna nastąpić przerwa (45 min od startu sesji)
+            const breakTargetTime = activeWorkInterval.startTime + workDurationForBreak;
+            
+            // 3. Oblicz pozostały czas
+            const remainingTime = breakTargetTime - Date.now();
+
+            // 4. Wyświetl czas lub komunikat
+            if (remainingTime > 0) {
+                timeToBreakDisplay.innerHTML = `Do przerwy <span style="font-weight: 600;" id="timeToBreak">${formatTime(remainingTime, true)}<span>`;
+            } else {
+                timeToBreakDisplay.textContent = "Zalecana przerwa!";
+                // W przyszłości tutaj możesz dodać logikę powiadomienia systemowego
+            }
+        }
+    } else {
+        // Jeśli nie pracujemy, wyświetl domyślny tekst
+        timeToBreakDisplay.textContent = "Do przerwy: --:--:--";
+    }
+    };
+
+    const updateUI = () => {
+      startWorkBtn.style.display = "none";
+      startBreakBtn.style.display = "none";
+      stopWorkBtn.style.display = "none";
+      stopBreakBtn.style.display = "none";
+      if (currentState === "IDLE") {
+        startWorkBtn.style.display = "block";
+        sessionStatusLabel.textContent = "Oczekiwanie";
+      } else if (currentState === "WORKING") {
+        startBreakBtn.style.display = "block";
+        stopWorkBtn.style.display = "block";
+        sessionStatusLabel.textContent = "Czas Pracy";
+      } else if (currentState === "ON_BREAK") {
+        stopBreakBtn.style.display = "block";
+        sessionStatusLabel.textContent = "Czas Przerwy";
+      }
+    };
+
+    // =================================================================
+    // INICJALIZACJA, ZAPIS I FUNKCJE DEV
+    // =================================================================
+    const initializeApp = async () => {
+      const savedDays = await window.electronAPI.getStoreValue("daysData");
+      daysData = savedDays || [];
+      resetDayData();
+      const lastWork = dayData.workData[dayData.workData.length - 1];
+      const lastBreak = dayData.breakData[dayData.breakData.length - 1];
+      if (lastWork && lastWork.endTime === null) {
+        currentState = "WORKING";
+        timerInterval = setInterval(updateTimers, 1000);
+      } else if (lastBreak && lastBreak.endTime === null) {
+        currentState = "ON_BREAK";
+        timerInterval = setInterval(updateTimers, 1000);
+      }
+      updateTimers();
+      updateUI();
+    };
+    const resetDayData = () => {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = today.getMonth() + 1;
+      const day = today.getDate();
+      let findToday = daysData.find(
+        (d) => d.year === year && d.month === month && d.day === day
+      );
+      if (findToday) {
+        dayData = findToday;
+      } else {
+        dayData = {
+          year,
+          month,
+          day,
+          allWorkTime: 0,
+          allBreakTime: 0,
+          workData: [],
+          breakData: [],
+          exercisesData: [],
+        };
+      }
+    };
+// ✅ ZASTĄP STARĄ FUNKCJĘ TĄ WERSJĄ
+const saveData = async () => {
+    if (!dayData || !dayData.year) return;
+
+    // =================================================================
+    // ✅ NOWA LOGIKA: Zamykanie aktywnego interwału przed zapisem
+    // =================================================================
+    // Sprawdź, czy praca była w toku podczas zamykania
+    if (currentState === "WORKING") {
+        const activeWorkInterval = dayData.workData[dayData.workData.length - 1];
+        // Upewnij się, że interwał faktycznie jest otwarty
+        if (activeWorkInterval && activeWorkInterval.endTime === null) {
+            activeWorkInterval.endTime = Date.now();
+            activeWorkInterval.duration = activeWorkInterval.endTime - activeWorkInterval.startTime;
+            console.log("Zamknięcie aplikacji: Zakończono aktywny interwał pracy.");
+        }
+    } 
+    // Sprawdź, czy przerwa była w toku
+    else if (currentState === "ON_BREAK") {
+        const activeBreakInterval = dayData.breakData[dayData.breakData.length - 1];
+        if (activeBreakInterval && activeBreakInterval.endTime === null) {
+            activeBreakInterval.endTime = Date.now();
+            activeBreakInterval.duration = activeBreakInterval.endTime - activeBreakInterval.startTime;
+            console.log("Zamknięcie aplikacji: Zakończono aktywny interwał przerwy.");
+        }
+    }
+    // =================================================================
+
+    // Reszta funkcji pozostaje bez zmian - teraz obliczy sumy poprawnie
+    dayData.allWorkTime = dayData.workData.reduce(
+        (total, interval) => total + (interval.duration || 0),
+        0
+    );
+    dayData.allBreakTime = dayData.breakData.reduce(
+        (total, interval) => total + (interval.duration || 0),
+        0
+    );
+
+    addOrUpdateDayData(daysData, dayData);
+    await window.electronAPI.setStoreValue("daysData", daysData);
+    console.log("Zapisano dane.");
+};
+    const dev_clearTodayData = async () => {
+      console.log("DEV: Czyszczenie danych na dziś...");
+      clearInterval(timerInterval);
+      currentState = "IDLE";
+      const today = new Date();
+      const todayIndex = daysData.findIndex(
+        (d) =>
+          d.year === today.getFullYear() &&
+          d.month === today.getMonth() + 1 &&
+          d.day === today.getDate()
+      );
+      if (todayIndex > -1) {
+        daysData.splice(todayIndex, 1);
+      }
+      await window.electronAPI.setStoreValue("daysData", daysData);
+      resetDayData();
+      updateUI();
+      mainTimerDisplay.textContent = "00:00:00";
+      sessionTimerDisplay.textContent = "00:00:00";
+      sessionStatusLabel.textContent = "Oczekiwanie";
+      console.log("DEV: Dane na dziś wyczyszczone.");
+    };
+
+    // =================================================================
+    // PODPIĘCIE EVENTÓW
+    // =================================================================
+    startWorkBtn.addEventListener("click", startWork);
+    startBreakBtn.addEventListener("click", startBreak);
+    stopWorkBtn.addEventListener("click", stopWork);
+    stopBreakBtn.addEventListener("click", stopBreak);
+    devClearBtn.addEventListener("click", dev_clearTodayData);
+    window.addEventListener("DOMContentLoaded", initializeApp);
+    window.addEventListener("beforeunload", saveData);
+  </script>
+</body>
