@@ -4,6 +4,7 @@ import { Informations } from "./components/informations";
 import { Timer } from "./components/timers";
 // UTILS
 import { findDate } from "./utils/findDate";
+import { endLastInterval } from "./utils/dataUpdaters";
 
 function App() {
   // ZMIENNE REACT
@@ -99,6 +100,25 @@ function App() {
       if (appState == "BREAK") {
         SessionTimeClear = Date.now() - activeBreakInterval.startTime;
       }
+
+      // Sprawdzanie czy przypadkiem nie jest nowy dzien np jakby ktoś sidział do 00:00
+      // let today = new Date();
+
+      let today = new Date(); // Zachowaj oryginał, żeby o nim nie zapomnieć
+      // DEV - TESTOWANIE ZMIANY DATY
+      // today.setDate(today.getDate() + 1); // "Przesuń" datę o jeden dzień do przodu
+      // today.setHours(0, 0, 1, 0); // Ustaw godzinę na 00:00:01
+      if (
+        todayData.day != today.getDate() ||
+        todayData.month != today.getMonth() + 1 ||
+        todayData.year != today.getFullYear()
+      ) {
+        console.log(`Timer wkroczył w nowy dzień`);
+        // 1. Zaktualizować koniec aktualnego interwału dodanie czasu końca
+        // 2. Zapisanie danych do electron store
+        // 3. Stowrzenie danych dla nowego dnia
+      }
+
       setSessionTime(SessionTimeClear);
     };
 
@@ -202,34 +222,11 @@ function App() {
     // Ustaianie statusu pracy
     setAppState("IDLE");
 
-    // Obliczanie nowych wartości
-    const endTime = Date.now();
-    const lastInterval = todayData.workData[todayData.workData.length - 1];
-    const duration = endTime - lastInterval.startTime;
-
     // Aktualizowanie danych dnia
-    setTodayData((prevTodayData) => {
-      // Za pomoca .map() tworzymy nowa tablice workData
-      const updatedWorkData = prevTodayData.workData.map((interval, index) => {
-        // jeśli to ostatni element w tablicy
-        if (index === prevTodayData.workData.length - 1) {
-          // zwracanie nowa zaktualizowana kopie
-          return {
-            ...interval,
-            endTime: endTime,
-            duration: duration,
-          };
-        }
-        // W przeciwnym razie zwróc bez zmian
-        return interval;
-      });
-
-      // Zwracamy kompletnie nowy obiekt, który zastapi start stan todayData
-      return {
-        ...prevTodayData, // Skopiuj wszystkie właściwości (year,month,day,etc.)
-        workData: updatedWorkData, // Nadpiszd `workData` nowa zaktualzowana tablica
-        allWorkTime: prevTodayData.allWorkTime + duration, // Zaktaulizuj łaczny czas pracy
-      };
+    endLastInterval({
+      setTodayData: setTodayData,
+      arrayKey: "workData",
+      totalTimeKey: "allWorkTime",
     });
   };
 
@@ -240,36 +237,11 @@ function App() {
     // Ustaianie statusu pracy
     setAppState("WORKING");
 
-    // Obliczanie nowych wartości
-    const endTime = Date.now();
-    const lastInterval = todayData.breakData[todayData.breakData.length - 1];
-    const duration = endTime - lastInterval.startTime;
-
     // Aktualizowanie danych dnia
-    setTodayData((prevTodayData) => {
-      // Za pomoca .map() tworzymy nowa tablice breakData
-      const updatedBreakData = prevTodayData.breakData.map(
-        (interval, index) => {
-          // jeśli to ostatni element w tablicy
-          if (index === prevTodayData.breakData.length - 1) {
-            // zwracanie nowa zaktualizowana kopie
-            return {
-              ...interval,
-              endTime: endTime,
-              duration: duration,
-            };
-          }
-          // W przeciwnym razie zwróc bez zmian
-          return interval;
-        }
-      );
-
-      // Zwracamy kompletnie nowy obiekt, który zastapi start stan todayData
-      return {
-        ...prevTodayData, // Skopiuj wszystkie właściwości (year,month,day,etc.)
-        breakData: updatedBreakData, // Nadpiszd `breakData` nowa zaktualzowana tablica
-        allBreakTime: prevTodayData.allBreakTime + duration, // Zaktaulizuj łaczny czas pracy
-      };
+    endLastInterval({
+      setTodayData: setTodayData,
+      arrayKey: "breakData",
+      totalTimeKey: "allBreakTime",
     });
 
     // Rozpoczynanie spowrotem pracy
