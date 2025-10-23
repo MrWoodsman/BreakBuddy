@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ActionButtons } from "./components/actionButtons";
 import { Informations } from "./components/informations";
 import { Timer } from "./components/timers";
@@ -294,7 +294,7 @@ function App() {
   handleDayRolloverRef.current = handleDayRollover;
 
   // Rozpoczynanie pracy
-  const startWork = () => {
+  const startWork = useCallback(() => {
     // Sprawdzenie czy przypadkiem już nie jest w czasie pracy
     if (appStateRef.current == "WORKING") return;
     // Ustaianie statusu pracy
@@ -316,10 +316,10 @@ function App() {
         workData: newWorkData,
       };
     });
-  };
+  }, []);
 
   // Rozpoczynanie przerwy
-  const startBreak = () => {
+  const startBreak = useCallback(() => {
     // 1. Sprawdzenie (bez zmian, ale czytelniej)
     if (appStateRef.current !== "WORKING") return;
 
@@ -367,12 +367,12 @@ function App() {
         breakData: newBreakData, // Zawiera rozpoczętą przerwę
       };
     });
-  };
+  }, []);
 
   // Konczenie pracy
-  const endWork = () => {
+  const endWork = useCallback(() => {
     // Sprawdzenie czy przypadkiem już nie jest w czasie pracy
-    if (appState != "WORKING") return;
+    if (appStateRef.current != "WORKING") return;
     // Ustaianie statusu pracy
     setAppState("IDLE");
 
@@ -382,10 +382,10 @@ function App() {
       arrayKey: "workData",
       totalTimeKey: "allWorkTime",
     });
-  };
+  }, []);
 
   // Konczenie przerwy
-  const endBreak = () => {
+  const endBreak = useCallback(() => {
     // Sprawdzenie czy przypadkiem już nie jest w czasie pracy
     if (appStateRef.current != "BREAK") return;
     // Ustaianie statusu pracy
@@ -400,37 +400,37 @@ function App() {
 
     // Rozpoczynanie spowrotem pracy
     startWork();
-  };
+  }, [startWork]);
 
-  // MACOS PRZYCISKI
+  // Przyciski w menu aplikacji
   useEffect(() => {
     const cleanup = window.electronAPI.onMenuAction((action) => {
-      console.log('Uruchomiono action', action, appStateRef.current);
+      console.log("Uruchomiono action", action, appStateRef.current);
       switch (action) {
         case "START-WORK":
-          startWork()
-          break
+          startWork();
+          break;
         case "START-BREAK":
-          startBreak()
-          break
+          startBreak();
+          break;
         case "END-WORK":
-          endWork()
-          break
+          endWork();
+          break;
         case "END-BREAK":
-          endBreak()
-          break
+          endBreak();
+          break;
         default:
-          console.warn('Nieznana akcja z menu: ', action)
+          console.warn("Nieznana akcja z menu: ", action);
       }
-    })
+    });
 
-    return cleanup
-  }, [])
+    return cleanup;
+  }, [startWork, startBreak, endBreak, endWork]);
 
   useEffect(() => {
     console.log(`React: Stan się zmienił na ${appState}. Wysyłam do main.js...`);
     window.electronAPI.updateMenuState(appState);
-  }, [appState])
+  }, [appState]);
 
   return (
     <div className="flex flex-col h-full">
