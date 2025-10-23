@@ -28,6 +28,7 @@ const createWindow = async () => {
   } else {
     // W trybie produkcyjnym, ładuj zbudowany plik HTML Reacta
     win.loadFile(path.join(__dirname, "../renderer/dist/index.html"));
+    win.setMenu(null);
   }
 };
 

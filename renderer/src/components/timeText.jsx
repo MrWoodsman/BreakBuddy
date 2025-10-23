@@ -1,11 +1,16 @@
-export const TimeText = ({
-  milliseconds,
-  lethers = false,
-  padStart = false,
-}) => {
-  // Zwracanie placeholdera jeśli nie istnaieje lub jest mniejsze niz 0
+import NumberFlow, { NumberFlowGroup } from "@number-flow/react";
+
+/**
+ * Komponent do wyświetlania czasu z animacją liczb.
+ * @param {object} props
+ * @param {number} props.milliseconds - Czas w milisekundach do sformatowania.
+ * @param {boolean} [props.letters=false] - Jeśli true, formatuje czas jako "1h 2m 3s". W przeciwnym razie "01:02:03".
+ * @param {boolean} [props.padStart=false] - Jeśli true (i `letters` jest false), dodaje wiodące zera (np. 01 zamiast 1).
+ */
+export const TimeText = ({ milliseconds, letters = false, padStart = false }) => {
+  // Zwracanie placeholdera, jeśli wartość jest nieprawidłowa
   if (isNaN(milliseconds) || milliseconds < 0) {
-    return lethers ? "0s" : "00:00:00";
+    return <span>{letters ? "0s" : "00:00:00"}</span>;
   }
 
   // Przekształcanie milisekund na godziny / minuty / sekundy
@@ -15,31 +20,43 @@ export const TimeText = ({
   const seconds = totalSeconds % 60;
 
   // ======================================
-  //            Format HH:MM:SS
+  //       Format HH:MM:SS
   // ======================================
-  if (!lethers) {
-    if (!padStart) {
-      return `${String(hours)}:${String(minutes)}:${String(seconds)}`;
-    }
-    // Dodawanie zer na początku
-    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  if (!letters) {
+    return (
+      <NumberFlowGroup>
+        <NumberFlow value={hours} pad={padStart ? 2 : 0} />
+        <span>:</span>
+        <NumberFlow value={minutes} pad={padStart ? 2 : 0} />
+        <span>:</span>
+        <NumberFlow value={seconds} pad={padStart ? 2 : 0} />
+      </NumberFlowGroup>
+    );
   }
 
   // ======================================
-  //            Format 0h 0m 0s
+  //       Format 0h 0m 0s
   // ======================================
-  const parts = [];
+  return (
+    <NumberFlowGroup>
+      {/* Wyświetlaj tylko, gdy godziny są większe od zera */}
+      {hours > 0 && (
+        <>
+          <NumberFlow value={hours} suffix="h" />
+          <span> </span>
+        </>
+      )}
 
-  if (hours > 0) {
-    parts.push(`${hours}h`);
-  }
-  if (minutes > 0) {
-    parts.push(`${minutes}m`);
-  }
-  // Sekundy pokazujemy zawsze
-  if (seconds > 0 || parts.length === 0) {
-    parts.push(`${seconds}s`);
-  }
+      {/* Wyświetlaj, gdy minuty lub godziny są większe od zera */}
+      {(minutes > 0 || hours > 0) && (
+        <>
+          <NumberFlow value={minutes} suffix="m" />
+          <span> </span>
+        </>
+      )}
 
-  return parts.join(" ");
+      {/* Sekundy wyświetlaj zawsze, co zapobiega migotaniu */}
+      <NumberFlow value={seconds} suffix="s" />
+    </NumberFlowGroup>
+  );
 };
