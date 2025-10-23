@@ -13,6 +13,7 @@ function App() {
   const [todayData, setTodayData] = useState(null);
   const [totalSessionTime, setTotalSessionTime] = useState(0);
   const [SessionTime, setSessionTime] = useState(0);
+  const [timeToBreakMs, setTimeToBreakMs] = useState(0);
   // REFs
   const appStateRef = useRef(appState);
   const todayDataRef = useRef(todayData);
@@ -123,9 +124,12 @@ function App() {
       const currentAppState = appStateRef.current;
       const currentTodayData = todayDataRef.current;
 
+      const WORK_DURATION_BEFORE_BREAK = 45 * 60 * 1000;
+
       if (!currentTodayData) {
         setTotalSessionTime(0);
         setSessionTime(0);
+        setTimeToBreakMs(0);
         return;
       }
 
@@ -139,14 +143,16 @@ function App() {
       // Aktualizowanie sumy czasu pracy
       // Zmienna tu zeby za kazdym razem zaczynała od 0 / bądz czasu który już jest
       let totalSessionTimeClear = currentTodayData.allBreakTime + currentTodayData.allWorkTime;
+      const nowTimestamp = Date.now();
+
       let activeWorkInterval = currentTodayData.workData[currentTodayData.workData.length - 1];
       let activeBreakInterval = currentTodayData.breakData[currentTodayData.breakData.length - 1];
 
       if (currentAppState == "WORKING") {
-        totalSessionTimeClear += Date.now() - activeWorkInterval.startTime;
+        totalSessionTimeClear += nowTimestamp - activeWorkInterval.startTime;
       }
       if (currentAppState == "BREAK") {
-        totalSessionTimeClear += Date.now() - activeBreakInterval.startTime;
+        totalSessionTimeClear += nowTimestamp - activeBreakInterval.startTime;
       }
       setTotalSessionTime(totalSessionTimeClear);
 
@@ -154,14 +160,30 @@ function App() {
       let SessionTimeClear = 0;
 
       if (currentAppState == "WORKING") {
-        SessionTimeClear = Date.now() - activeWorkInterval.startTime;
+        SessionTimeClear = nowTimestamp - activeWorkInterval.startTime;
       }
       if (currentAppState == "BREAK") {
-        SessionTimeClear = Date.now() - activeBreakInterval.startTime;
+        SessionTimeClear = nowTimestamp - activeBreakInterval.startTime;
+      }
+
+      // LICZENIE CZASU DO PRZERWY
+      if (
+        currentAppState === "WORKING" &&
+        activeWorkInterval &&
+        activeWorkInterval.endTime === null
+      ) {
+        const breakTargetTime = activeWorkInterval.startTime + WORK_DURATION_BEFORE_BREAK;
+        const remainingTime = breakTargetTime - nowTimestamp; // Używamy 'nowTimestamp'
+
+        // Ustawiamy stan w milisekundach
+        setTimeToBreakMs(remainingTime > 0 ? remainingTime : 0);
+      } else {
+        // Jeśli nie pracujemy, lub nie ma aktywnego interwału pracy
+        setTimeToBreakMs(0);
       }
 
       // Sprawdzanie czy przypadkiem nie jest nowy dzien np jakby ktoś sidział do 00:00
-      let today = new Date(); // Zachowaj oryginał, żeby o nim nie zapomnieć
+      let today = new Date(nowTimestamp); // Zachowaj oryginał, żeby o nim nie zapomnieć
       // // DEV - TESTOWANIE ZMIANY DATY
       // today.setDate(today.getDate() + 1); // "Przesuń" datę o jeden dzień do przodu
       // today.setHours(0, 0, 1, 0); // Ustaw godzinę na 00:00:01
@@ -298,37 +320,51 @@ function App() {
 
   // Rozpoczynanie przerwy
   const startBreak = () => {
-    // Sprawdzenie czy przypadkiem już nie jest w czasie przerwy
-    if (appStateRef.current == "BREAK" || appStateRef.current != "WORKING") return;
-    // Kończenie aktualnego czasu pracy
+    // 1. Sprawdzenie (bez zmian, ale czytelniej)
+    if (appStateRef.current !== "WORKING") return;
 
-    // Obliczanie nowych wartości
-    const endTime = Date.now();
-    const lastInterval = todayData.workData[todayData.workData.length - 1];
-    const duration = endTime - lastInterval.startTime;
+    // 2. Ustawiamy stan aplikacji (to jest bezpieczne)
+    setAppState("BREAK");
 
-    // Aktualizowanie danych dnia
+    // 3. Obliczamy JEDEN moment w czasie
+    const breakStartTime = Date.now(); // Użyjemy tego samego czasu dla obu akcji
+
+    // 4. Tworzymy nowy interwał przerwy
+    const newBreakInterval = {
+      startTime: breakStartTime, // Przerwa zaczyna się DOKŁADNIE, gdy praca się kończy
+      endTime: null,
+      duration: null,
+    };
+
+    // 5. Wykonujemy JEDNĄ, dużą aktualizację stanu
     setTodayData((prevTodayData) => {
-      // Za pomoca .map() tworzymy nowa tablice workData
+      // Strażnik na wypadek, gdyby dane były null
+      if (!prevTodayData) return prevTodayData;
+
+      // === Logika z pierwszej aktualizacji (zakończenie pracy) ===
+      const lastWorkInterval = prevTodayData.workData[prevTodayData.workData.length - 1];
+      const workDuration = breakStartTime - lastWorkInterval.startTime;
+
       const updatedWorkData = prevTodayData.workData.map((interval, index) => {
-        // jeśli to ostatni element w tablicy
         if (index === prevTodayData.workData.length - 1) {
-          // zwracanie nowa zaktualizowana kopie
           return {
             ...interval,
-            endTime: endTime,
-            duration: duration,
+            endTime: breakStartTime, // Używamy naszego jednego czasu
+            duration: workDuration,
           };
         }
-        // W przeciwnym razie zwróc bez zmian
         return interval;
       });
 
-      // Zwracamy kompletnie nowy obiekt, który zastapi start stan todayData
+      // === Logika z drugiej aktualizacji (rozpoczęcie przerwy) ===
+      const newBreakData = [...prevTodayData.breakData, newBreakInterval];
+
+      // === Zwracamy JEDEN, kompletny, nowy obiekt stanu ===
       return {
-        ...prevTodayData, // Skopiuj wszystkie właściwości (year,month,day,etc.)
-        workData: updatedWorkData, // Nadpiszd `workData` nowa zaktualzowana tablica
-        allWorkTime: prevTodayData.allWorkTime + duration, // Zaktaulizuj łaczny czas pracy
+        ...prevTodayData,
+        workData: updatedWorkData, // Zawiera zakończoną pracę
+        allWorkTime: prevTodayData.allWorkTime + workDuration, // Zawiera zaktualizowany czas
+        breakData: newBreakData, // Zawiera rozpoczętą przerwę
       };
     });
   };
@@ -368,6 +404,7 @@ function App() {
 
   return (
     <div className="flex flex-col h-full">
+      <button className="absolute right-4 top-4 bg-neutral-400 w-8 h-8 cursor-pointer">S</button>
       {/* DEV */}
       {/* <p>{appState}</p> */}
       {/* TIMERS */}
@@ -381,6 +418,7 @@ function App() {
         onStartBreak={startBreak}
         onEndWork={endWork}
         onEndBreak={endBreak}
+        timeToBreak={timeToBreakMs}
       />
     </div>
   );

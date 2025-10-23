@@ -3,7 +3,8 @@ const path = require("path");
 
 let store;
 
-const isDev = process.env.NODE_ENV !== "production";
+// Zamiast polegać na NODE_ENV, użyj wbudowanej właściwości Electrona
+const isDev = !app.isPackaged;
 
 const createWindow = async () => {
   const { default: Store } = await import("electron-store");
@@ -11,7 +12,7 @@ const createWindow = async () => {
 
   const win = new BrowserWindow({
     width: 350,
-    height: 600,
+    height: 450,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       // Ważne dla bezpieczeństa i komunikacji React <-> Electronn

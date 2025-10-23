@@ -14,7 +14,7 @@ export const TimeText = ({ milliseconds, letters = false, padStart = false }) =>
   }
 
   // Przekształcanie milisekund na godziny / minuty / sekundy
-  const totalSeconds = Math.floor(milliseconds / 1000);
+  const totalSeconds = Math.round(milliseconds / 1000);
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
