@@ -387,7 +387,7 @@ function App() {
   // Konczenie przerwy
   const endBreak = () => {
     // Sprawdzenie czy przypadkiem już nie jest w czasie pracy
-    if (appState != "BREAK") return;
+    if (appStateRef.current != "BREAK") return;
     // Ustaianie statusu pracy
     setAppState("WORKING");
 
@@ -402,9 +402,41 @@ function App() {
     startWork();
   };
 
+  // MACOS PRZYCISKI
+  useEffect(() => {
+    const cleanup = window.electronAPI.onMenuAction((action) => {
+      console.log('Uruchomiono action', action, appStateRef.current);
+      switch (action) {
+        case "START-WORK":
+          startWork()
+          break
+        case "START-BREAK":
+          startBreak()
+          break
+        case "END-WORK":
+          endWork()
+          break
+        case "END-BREAK":
+          endBreak()
+          break
+        default:
+          console.warn('Nieznana akcja z menu: ', action)
+      }
+    })
+
+    return cleanup
+  }, [])
+
+  useEffect(() => {
+    console.log(`React: Stan się zmienił na ${appState}. Wysyłam do main.js...`);
+    window.electronAPI.updateMenuState(appState);
+  }, [appState])
+
   return (
     <div className="flex flex-col h-full">
-      <button className="absolute right-4 top-4 bg-neutral-400 w-8 h-8 cursor-pointer">S</button>
+      <button className="absolute right-2 top-2 bg-neutral-200 w-8 h-8 cursor-pointer rounded-2xl">
+        <i className="bi bi-gear-wide-connected text-neutral-500"></i>
+      </button>
       {/* DEV */}
       {/* <p>{appState}</p> */}
       {/* TIMERS */}

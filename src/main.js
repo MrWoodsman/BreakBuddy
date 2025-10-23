@@ -21,9 +21,42 @@ const createWindow = async () => {
     },
   });
 
+  // Funkcja do aktualizowania stanu menu apliakcji
+  function updateMenu(state) {
+    const menu = Menu.getApplicationMenu();
+    if (!menu) return;
+
+    // Pobierz referencje do opcji menu po ich ID
+    const startWorkItem = menu.getMenuItemById('start-work');
+    const startBreakItem = menu.getMenuItemById('start-break');
+    const stopBreakItem = menu.getMenuItemById('end-break');
+    const stopWorkItem = menu.getMenuItemById('end-work');
+    
+    // Ustaw stan 'enabled' na podstawie stanu aplikacji z Reacta
+    switch (state) {
+      case 'IDLE':
+        startWorkItem.enabled = true;
+        startBreakItem.enabled = false;
+        stopBreakItem.enabled = false;
+        stopWorkItem.enabled = false;
+        break;
+      case 'WORKING':
+        startWorkItem.enabled = false;
+        startBreakItem.enabled = true;
+        stopBreakItem.enabled = false;
+        stopWorkItem.enabled = true;
+        break;
+      case 'BREAK':
+        startWorkItem.enabled = false;
+        startBreakItem.enabled = false;
+        stopBreakItem.enabled = true;
+        stopWorkItem.enabled = false;
+        break;
+    }
+  }
+
   //Tworzenie menu 
   const template = [
-    // Pierwszy element na macOS to zawsze menu aplikacji
     {
       label: app.getName(), // Nazwa aplikacji (np. "Licznik")
       submenu: [
@@ -33,20 +66,49 @@ const createWindow = async () => {
       ]
     },
     {
-      label: "Akcje",
-      submenu: [
-        {label: "Rozpocznij prace", enabled: true},
-        {label: "Rozpocznij przerwe", enabled: false},
-        {label: "Zakończ przerwe", enabled: false},
-        {label: "Zakończ prace", enabled: false},
-      ]
-    }
+    label: 'Akcje',
+    submenu: [
+      {
+        id: 'start-work',
+        label: "Rozpocznij pracę",
+        accelerator: 'CmdOrCtrl+W', // Skrót klawiszowy
+        enabled: true, // Domyślnie włączone
+        click: () => win.webContents.send('action-button', 'START-WORK')
+      },
+      {
+        id: 'start-break',
+        label: "Rozpocznij przerwę",
+        accelerator: 'CmdOrCtrl+B',
+        enabled: false,
+        click: () => win.webContents.send('action-button', 'START-BREAK')
+      },
+      {
+        id: 'end-break',
+        label: "Zakończ przerwę",
+        accelerator: 'CmdOrCtrl+E',
+        enabled: false,
+        click: () => win.webContents.send('action-button', 'END-BREAK')
+      },
+      {
+        id: 'end-work',
+        label: "Zakończ pracę",
+        accelerator: 'CmdOrCtrl+S',
+        enabled: false,
+        click: () => win.webContents.send('action-button', 'END-WORK')
+      },
+    ]
+  },
   ];
 
+  // Tworzenie menu z tempaltu
   const menu = Menu.buildFromTemplate(template);
-
-  // 3. Ustaw to menu jako główne menu aplikacji
+  // Ustawianie menu jako głowne dla aplikacji
   Menu.setApplicationMenu(menu);
+
+  ipcMain.on('update-menu-state', (event, newState) => {
+    console.log(`MAIN: Otrzymano nowy stan: ${newState}. Aktualizuję menu.`);
+    updateMenu(newState);
+  });
 
   // Logika ładowania widoku
   if (isDev) {
@@ -86,3 +148,5 @@ ipcMain.handle("set-store-value", (event, key, value) => {
   store.set(key, value);
   return true;
 });
+
+
