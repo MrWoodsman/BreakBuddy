@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require("electron"); // Dodaj ipcMain
+const { app, BrowserWindow, ipcMain, Menu } = require("electron"); // Dodaj ipcMain
 const path = require("path");
 
 let store;
@@ -20,6 +20,33 @@ const createWindow = async () => {
       nodeIntegration: false,
     },
   });
+
+  //Tworzenie menu 
+  const template = [
+    // Pierwszy element na macOS to zawsze menu aplikacji
+    {
+      label: app.getName(), // Nazwa aplikacji (np. "Licznik")
+      submenu: [
+        // { role: 'about', label: 'O programie Licznik' },
+        // { type: 'separator' },
+        { role: 'quit', label: 'Zakończ Licznik' }
+      ]
+    },
+    {
+      label: "Akcje",
+      submenu: [
+        {label: "Rozpocznij prace", enabled: true},
+        {label: "Rozpocznij przerwe", enabled: false},
+        {label: "Zakończ przerwe", enabled: false},
+        {label: "Zakończ prace", enabled: false},
+      ]
+    }
+  ];
+
+  const menu = Menu.buildFromTemplate(template);
+
+  // 3. Ustaw to menu jako główne menu aplikacji
+  Menu.setApplicationMenu(menu);
 
   // Logika ładowania widoku
   if (isDev) {
