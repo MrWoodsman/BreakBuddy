@@ -442,7 +442,6 @@ function App() {
       {/* TIMERS */}
       <Timer totalTime={totalSessionTime} sessionTime={SessionTime} />
       {/* INFORMATIONS */}
-      <Informations />
       {/* ACTIONS BUTTONS */}
       <ActionButtons
         appState={appState}

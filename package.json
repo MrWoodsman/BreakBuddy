@@ -1,6 +1,6 @@
 {
-  "name": "moj-projekt-electron-t",
-  "productName": "Licznik",
+  "name": "break-buddy",
+  "productName": "BreakBuddy",
   "version": "1.0.0",
   "description": "Aplikacja do mierzenia czasu pracy",
   "main": "src/main.js",
