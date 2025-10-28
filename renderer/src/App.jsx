@@ -5,6 +5,7 @@ import { Timer } from "./components/timers";
 // UTILS
 import { findDate } from "./utils/findDate";
 import { endLastInterval } from "./utils/dataUpdaters";
+import { PageSettings } from "./pages/PageSettings.jsx";
 
 function App() {
   // ZMIENNE REACT
@@ -254,8 +255,8 @@ function App() {
     // Zapisanie sfianlziowanego stargego dnia
     const updatedDaysData = currentDaysData.map((day) =>
       day.year === finalOldTodayData.year &&
-      day.month === finalOldTodayData.month &&
-      day.day === finalOldTodayData.day
+        day.month === finalOldTodayData.month &&
+        day.day === finalOldTodayData.day
         ? finalOldTodayData
         : day
     );
@@ -432,26 +433,36 @@ function App() {
     window.electronAPI.updateMenuState(appState);
   }, [appState]);
 
+  const [page, setPage] = useState("HOME")
+
   return (
-    <div className="flex flex-col h-full">
-      <button className="absolute right-2 top-2 bg-neutral-200 w-8 h-8 cursor-pointer rounded-2xl">
-        <i className="bi bi-gear-wide-connected text-neutral-500"></i>
-      </button>
-      {/* DEV */}
-      {/* <p>{appState}</p> */}
-      {/* TIMERS */}
-      <Timer totalTime={totalSessionTime} sessionTime={SessionTime} />
-      {/* INFORMATIONS */}
-      {/* ACTIONS BUTTONS */}
-      <ActionButtons
-        appState={appState}
-        onStartWork={startWork}
-        onStartBreak={startBreak}
-        onEndWork={endWork}
-        onEndBreak={endBreak}
-        timeToBreak={timeToBreakMs}
-      />
-    </div>
+    <>
+      {page == "HOME" && (
+        <div className="flex flex-col h-full">
+          <button onClick={() => setPage("SETTINGS")} className="absolute right-2 top-2 bg-neutral-200 w-8 h-8 cursor-pointer rounded-2xl">
+            <i className="bi bi-gear-wide-connected text-neutral-500"></i>
+          </button>
+          {/* DEV */}
+          {/* <p>{appState}</p> */}
+          {/* TIMERS */}
+          <Timer totalTime={totalSessionTime} sessionTime={SessionTime} />
+          {/* INFORMATIONS */}
+          <Informations />
+          {/* ACTIONS BUTTONS */}
+          <ActionButtons
+            appState={appState}
+            onStartWork={startWork}
+            onStartBreak={startBreak}
+            onEndWork={endWork}
+            onEndBreak={endBreak}
+            timeToBreak={timeToBreakMs}
+          />
+        </div>
+      )}
+      {page == "SETTINGS" && (
+        <PageSettings closeSettings={() => setPage("HOME")} />
+      )}
+    </>
   );
 }
 
