@@ -5,7 +5,7 @@ import { Timer } from "./components/timers";
 // UTILS
 import { findDate } from "./utils/findDate";
 import { endLastInterval } from "./utils/dataUpdaters";
-import { PageSettings } from "./pages/PageSettings.jsx";
+import { PageSettings } from "./pages/PageSettings/PageSettings.jsx";
 
 function App() {
   // ZMIENNE REACT

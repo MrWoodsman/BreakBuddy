@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
 // --- STYLIZACJA SCROLLBARA I INPUTÓW ---
-// Dodane nowe reguły CSS do ukrywania strzałek w polach numerycznych
 const GlobalStyles = () => (
     <style jsx global>{`
         /* Stylizacja paska przewijania */
@@ -105,7 +104,7 @@ export const PageSettings = ({ closeSettings }) => {
                                 <button onClick={() => setIsModalOpen(true)} className="text-blue-500 font-medium hover:text-blue-700">Dodaj nowe</button>
                             }
                         >
-                            <div className="space-y-2 px-4 py-2">
+                            <div className="space-y-2 px-2 py-2">
                                 {exercises.length > 0 ? (
                                     exercises.map(ex => (
                                         <ExerciseItem
