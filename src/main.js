@@ -1,6 +1,8 @@
 const { app, BrowserWindow, ipcMain, Menu } = require("electron"); // Dodaj ipcMain
 const path = require("path");
 
+// Sprawdzanie systemu
+const isMac = process.platform === "darwin";
 // DEFINIOWANIE ZMIENEJ STORE
 let store;
 // ZMIENNA DEV DO ODPOWIEDNIEGO WYŚWIETLANIA
@@ -24,7 +26,6 @@ const createWindow = async () => {
 
   // Funkcja do aktualizowania stanu menu apliakcji
   function updateMenu(state) {
-    const isMac = process.platform === "darwin";
     const menu = Menu.getApplicationMenu();
     if (!menu) return;
 
