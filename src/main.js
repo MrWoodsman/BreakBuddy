@@ -24,6 +24,7 @@ const createWindow = async () => {
 
   // Funkcja do aktualizowania stanu menu apliakcji
   function updateMenu(state) {
+    const isMac = process.platform === "darwin";
     const menu = Menu.getApplicationMenu();
     if (!menu) return;
 
@@ -58,14 +59,24 @@ const createWindow = async () => {
 
   //Tworzenie template dla menu
   const template = [
-    {
-      label: app.getName(), // Nazwa aplikacji (np. "Licznik")
-      submenu: [
-        // { role: 'about', label: 'O programie Licznik' },
-        // { type: 'separator' },
-        { role: "quit", label: "Zakończ Licznik" },
-      ],
-    },
+    ...(isMac
+      ? [
+          {
+            label: app.name,
+            submenu: [
+              { role: "about" },
+              { type: "separator" },
+              { role: "services" },
+              { type: "separator" },
+              { role: "hide" },
+              { role: "hideOthers" },
+              { role: "unhide" },
+              { type: "separator" },
+              { role: "quit" },
+            ],
+          },
+        ]
+      : []),
     {
       label: "Akcje",
       submenu: [
