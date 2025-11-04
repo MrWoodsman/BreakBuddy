@@ -1,8 +1,9 @@
 import React, { useState } from "react";
+import { useSettings } from "../../contexts/SettingsContext";
 
 // --- STYLIZACJA SCROLLBARA I INPUTÓW ---
 const GlobalStyles = () => (
-    <style jsx global>{`
+    <style>{`
         /* Stylizacja paska przewijania */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
@@ -27,31 +28,25 @@ const GlobalStyles = () => (
 
 // --- GŁÓWNY KOMPONENT STRONY USTAWIEŃ ---
 export const PageSettings = ({ closeSettings }) => {
-    // Stany dla ustawień
-    const [recommendExercises, setRecommendExercises] = useState(true);
+    // Uzycie hooka 'useSettings'
+    const {
+        recommendExercises,
+        exercises,
+        breakInterval,
+        toggleRecomendExercises,
+        addExcercise,
+        deleteExercise,
+        updateBreakInterval
+    } = useSettings();
 
     // Stan dla modala
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // Stan dla listy ćwiczeń z nowymi polami
-    const [exercises, setExercises] = useState([
-        { id: 1, name: "Pompki", reps_min: 5, reps_max: 15 },
-        { id: 2, name: "Przysiady", reps_min: 10, reps_max: 20 },
-    ]);
-
-    // --- Logika Ćwiczeń ---
-    const handleAddNewExercise = (exerciseData) => {
-        const newExercise = {
-            id: Date.now(),
-            ...exerciseData, // { name, reps_min, reps_max }
-        };
-        setExercises([...exercises, newExercise]);
-        setIsModalOpen(false); // Zamknij modal po dodaniu
-    };
-
-    const handleDeleteExercise = (idToDelete) => {
-        setExercises(exercises.filter(exercise => exercise.id !== idToDelete));
-    };
+    // --- Logika Ćwiczeń
+    const handleSaveNewExercise = (exerciseData) => {
+        addExcercise(exerciseData)
+        setIsModalOpen(false)
+    }
 
     return (
         <>
@@ -60,7 +55,7 @@ export const PageSettings = ({ closeSettings }) => {
             {isModalOpen && (
                 <AddExerciseModal
                     onClose={() => setIsModalOpen(false)}
-                    onSave={handleAddNewExercise}
+                    onSave={handleSaveNewExercise}
                 />
             )}
 
@@ -85,15 +80,16 @@ export const PageSettings = ({ closeSettings }) => {
 
                         {/* Grupa "Harmonogram Przerw" */}
                         <SettingsGroup title="Harmonogram przerw">
+
                             <SettingsRow title="Zalecane przerwy">
                                 <div className="flex items-center">
                                     <p className="mr-2 text-neutral-600">Co</p>
-                                    <input className="w-16 text-center px-2 h-9 border rounded-md border-neutral-300" type="number" defaultValue="25" />
+                                    <input className="w-16 text-center px-2 h-9 border rounded-md border-neutral-300" type="number" value={breakInterval} onChange={(e) => updateBreakInterval(e.target.value)} />
                                     <p className="ml-2 text-neutral-600">minut</p>
                                 </div>
                             </SettingsRow>
                             <SettingsRow title="Polecanie ćwiczeń">
-                                <ToggleSwitch checked={recommendExercises} onChange={() => setRecommendExercises(!recommendExercises)} />
+                                <ToggleSwitch checked={recommendExercises} onChange={toggleRecomendExercises} />
                             </SettingsRow>
                         </SettingsGroup>
 
@@ -110,7 +106,7 @@ export const PageSettings = ({ closeSettings }) => {
                                         <ExerciseItem
                                             key={ex.id}
                                             exercise={ex}
-                                            onDelete={() => handleDeleteExercise(ex.id)}
+                                            onDelete={() => deleteExercise(ex.id)}
                                         />
                                     ))
                                 ) : (
@@ -135,7 +131,7 @@ const AddExerciseModal = ({ onClose, onSave }) => {
 
     const handleSave = () => {
         if (name.trim() === "") {
-            alert("Nazwa ćwiczenia nie może być pusta!");
+            console.error("Nazwa ćwiczenia nie może być pusta!");
             return;
         }
         onSave({ name, reps_min: parseInt(repsMin), reps_max: parseInt(repsMax) });
