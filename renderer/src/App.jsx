@@ -6,6 +6,8 @@ import { Timer } from "./components/timers";
 import { findDate } from "./utils/findDate";
 import { endLastInterval } from "./utils/dataUpdaters";
 import { PageSettings } from "./pages/PageSettings/PageSettings.jsx";
+// CONTEXT's
+import { useSettings } from "./contexts/SettingsContext.jsx";
 
 function App() {
   // ZMIENNE REACT
@@ -21,6 +23,10 @@ function App() {
   const daysDataRef = useRef(daysData);
   const handleDayRolloverRef = useRef(null);
   const startWorkRef = useRef(null);
+
+  // Czas zalecanej przerwy
+  const { breakInterval } = useSettings();
+  const WORK_DURATION_BEFORE_BREAK = breakInterval * 60 * 1000;
 
   // Synchronizacja refow po kazdej zmainie
   useEffect(() => {
@@ -125,8 +131,6 @@ function App() {
       const currentAppState = appStateRef.current;
       const currentTodayData = todayDataRef.current;
 
-      const WORK_DURATION_BEFORE_BREAK = 45 * 60 * 1000;
-
       if (!currentTodayData) {
         setTotalSessionTime(0);
         setSessionTime(0);
@@ -212,7 +216,7 @@ function App() {
     return () => {
       clearInterval(timerId);
     };
-  }, []);
+  }, [WORK_DURATION_BEFORE_BREAK]);
 
   function handleDayRollover(activeKeys) {
     console.log("Wykryto przejście północy. Rozpoczynam procedurę zmiany dnia...");
