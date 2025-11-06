@@ -1,7 +1,7 @@
 {
   "name": "break-buddy",
   "productName": "BreakBuddy",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Aplikacja do mierzenia czasu pracy",
   "main": "src/main.js",
   "scripts": {
@@ -20,6 +20,7 @@
   "devDependencies": {
     "@electron-forge/cli": "^7.10.2",
     "@electron-forge/maker-deb": "^7.10.2",
+    "@electron-forge/maker-dmg": "^7.10.2",
     "@electron-forge/maker-rpm": "^7.10.2",
     "@electron-forge/maker-squirrel": "^7.10.2",
     "@electron-forge/maker-zip": "^7.10.2",

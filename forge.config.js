@@ -1,3 +1,4 @@
+// forge.config.js
 const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 
@@ -6,31 +7,42 @@ module.exports = {
     asar: true,
   },
   rebuildConfig: {},
-  makers: [
+makers: [
+    // BLOK MAKER-SQUIRREL POZOSTAJE USUNIĘTY (dla budowania na Macu)
+
     {
-      name: '@electron-forge/maker-squirrel',
-      config: {},
+      // Ten maker stworzy plik .zip DLA WINDOWS
+      name: '@electron-forge/maker-zip',
+      platforms: ['win32'], 
     },
     {
-      name: '@electron-forge/maker-zip',
+      // --- NOWA ZMIANA ---
+      // Ten maker stworzy obraz dysku .dmg DLA MACOS
+      name: '@electron-forge/maker-dmg',
       platforms: ['darwin'],
+      config: {
+        // Opcjonalnie: możesz tu dodać tło, ikony itp.
+        // background: './assets/dmg-background.png',
+        // format: 'ULFO'
+      }
     },
     {
       name: '@electron-forge/maker-deb',
+      platforms: ['linux'],
       config: {},
     },
     {
       name: '@electron-forge/maker-rpm',
+      platforms: ['linux'],
       config: {},
     },
   ],
   plugins: [
+    // ... Twoje pluginy Fuses zostają bez zmian
     {
       name: '@electron-forge/plugin-auto-unpack-natives',
       config: {},
     },
-    // Fuses are used to enable/disable various Electron functionality
-    // at package time, before code signing the application
     new FusesPlugin({
       version: FuseVersion.V1,
       [FuseV1Options.RunAsNode]: false,
