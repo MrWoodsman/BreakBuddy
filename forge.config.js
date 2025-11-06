@@ -1,46 +1,45 @@
 // forge.config.js
-const { FusesPlugin } = require('@electron-forge/plugin-fuses');
-const { FuseV1Options, FuseVersion } = require('@electron/fuses');
+const { FusesPlugin } = require("@electron-forge/plugin-fuses");
+const { FuseV1Options, FuseVersion } = require("@electron/fuses");
 
 module.exports = {
   packagerConfig: {
     asar: true,
   },
   rebuildConfig: {},
-makers: [
-    // BLOK MAKER-SQUIRREL POZOSTAJE USUNIĘTY (dla budowania na Macu)
-
+  makers: [
     {
-      // Ten maker stworzy plik .zip DLA WINDOWS
-      name: '@electron-forge/maker-zip',
-      platforms: ['win32'], 
+      name: "@electron-forge/maker-squirrel",
+      platforms: ["win32"],
+      config: {
+        // Opcjonalne: możesz tu dodać ikony, GIFy itp.
+        // setupIcon: './path/to/icon.ico'
+      },
     },
     {
-      // --- NOWA ZMIANA ---
-      // Ten maker stworzy obraz dysku .dmg DLA MACOS
-      name: '@electron-forge/maker-dmg',
-      platforms: ['darwin'],
+      name: "@electron-forge/maker-dmg",
+      platforms: ["darwin"],
       config: {
         // Opcjonalnie: możesz tu dodać tło, ikony itp.
         // background: './assets/dmg-background.png',
         // format: 'ULFO'
-      }
+      },
     },
     {
-      name: '@electron-forge/maker-deb',
-      platforms: ['linux'],
+      name: "@electron-forge/maker-deb",
+      platforms: ["linux"],
       config: {},
     },
     {
-      name: '@electron-forge/maker-rpm',
-      platforms: ['linux'],
+      name: "@electron-forge/maker-rpm",
+      platforms: ["linux"],
       config: {},
     },
   ],
   plugins: [
     // ... Twoje pluginy Fuses zostają bez zmian
     {
-      name: '@electron-forge/plugin-auto-unpack-natives',
+      name: "@electron-forge/plugin-auto-unpack-natives",
       config: {},
     },
     new FusesPlugin({
