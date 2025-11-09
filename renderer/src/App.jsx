@@ -440,7 +440,17 @@ function App() {
   const [page, setPage] = useState("HOME")
 
   const exerciseDone = (data) => {
-    console.log(data)
+    let now = Date.now()
+    console.log(data, now)
+    todayData.exercisesData
+
+    setTodayData(prevData => ({
+      ...prevData,
+      exercisesData: [
+        ...prevData.exercisesData,
+        { name: data.name, reps: data.reps, timestamp: now }
+      ]
+    }))
   }
 
   return (
