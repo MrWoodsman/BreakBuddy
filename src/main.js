@@ -1,6 +1,10 @@
 const { app, BrowserWindow, ipcMain, Menu } = require("electron"); // Dodaj ipcMain
 const path = require("path");
 
+if (require("electron-squirrel-startup")) {
+  app.quit();
+}
+
 // Sprawdzanie systemu
 const isMac = process.platform === "darwin";
 // DEFINIOWANIE ZMIENEJ STORE
