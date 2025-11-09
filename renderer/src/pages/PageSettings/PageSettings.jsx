@@ -70,13 +70,13 @@ export const PageSettings = ({ closeSettings }) => {
 
                     <div className="p-4 space-y-8">
                         {/* Grupa "Wygląd" */}
-                        <SettingsGroup title="Wygląd i dane">
+                        {/* <SettingsGroup title="Wygląd i dane">
                             <SettingsRow title="Wyczyść dane aplikacji">
                                 <button className="px-3 py-1.5 rounded-md bg-red-500 text-white font-semibold text-sm hover:bg-red-600">
                                     Usuń
                                 </button>
                             </SettingsRow>
-                        </SettingsGroup>
+                        </SettingsGroup> */}
 
                         {/* Grupa "Harmonogram Przerw" */}
                         <SettingsGroup title="Harmonogram przerw">
