@@ -439,6 +439,10 @@ function App() {
 
   const [page, setPage] = useState("HOME")
 
+  const exerciseDone = (data) => {
+    console.log(data)
+  }
+
   return (
     <>
       {page == "HOME" && (
@@ -460,6 +464,7 @@ function App() {
             onEndWork={endWork}
             onEndBreak={endBreak}
             timeToBreak={timeToBreakMs}
+            onExerciseDone={exerciseDone}
           />
         </div>
       )}

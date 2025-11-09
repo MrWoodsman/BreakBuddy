@@ -20,6 +20,7 @@ export const ActionButtons = ({
   onEndWork,
   onEndBreak,
   timeToBreak,
+  onExerciseDone
 }) => {
   const [recommendedExercise, setRecommendedExercise] = useState(null);
   const [exerciseCompleted, setExerciseCompleted] = useState(false); // <-- NOWY STAN
@@ -58,7 +59,7 @@ export const ActionButtons = ({
   const handleExerciseClick = () => {
     if (!recommendedExercise || exerciseCompleted) return;
 
-    // onExerciseDone(recommendedExercise); // Wysyłamy dane ćwiczenia do App.jsx
+    onExerciseDone(recommendedExercise); // Wysyłamy dane ćwiczenia do App.jsx
     // console.log('Zapisanie w bazie');
     setExerciseCompleted(true);
   }
