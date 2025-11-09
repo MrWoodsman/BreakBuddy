@@ -29,7 +29,6 @@ export const ActionButtons = ({
 
   // Ten useEffect "obserwuje" zmianę stanu aplikacji
   useEffect(() => {
-    // Kiedy zaczyna się przerwa...
     if (appState === "BREAK" && exercises && exercises.length > 0) {
 
       // Losowanie ćwiczenia z listy
