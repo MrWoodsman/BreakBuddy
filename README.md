@@ -5,7 +5,7 @@
 [![Pobierz dla Windows](https://img.shields.io/badge/Windows-Download-blue?logo=windows&style=for-the-badge)](https://github.com/MrWoodsman/BreakBuddy/releases/download/v0.0.1/BreakBuddy-0.0.1%20Setup.exe) [![Pobierz dla macOS](https://img.shields.io/badge/macOS-Download-grey?logo=apple&style=for-the-badge)](https://github.com/MrWoodsman/BreakBuddy/releases/download/v0.0.1/BreakBuddy-0.0.1-arm64.dmg)
 
 Aplikacja desktopowa działająca na **Windows** i **macOS**, która pomaga śledzić czas pracy oraz przypomina o przerwach.  
-Podczas przerw proponuje krótkie ćwiczenia, które pomagają zadbać o zdrowie i efektywność.  
+Podczas przerw proponuje krótkie ćwiczenia, które pomagają zadbać o zdrowie i efektywność.
 
 Aplikacja tworzy **sesje pracy**, które pozwalają analizować Twój dzień i nawyki.  
 W ustawieniach możesz spersonalizować częstotliwość przerw oraz rodzaj proponowanych ćwiczeń.
@@ -16,12 +16,12 @@ W ustawieniach możesz spersonalizować częstotliwość przerw oraz rodzaj prop
 
 ## ✨ Funkcjonalności
 
-- ✅ Liczenie czasu pracy i przerw  
-- ✅ Odliczanie czasu do następnej przerwy  
-- 🔜 Polecanie ćwiczeń podczas przerw  
-- 🔜 Ustawienia: sugerowany czas przerwy, lista ćwiczeń, moment polecania ćwiczeń  
-- 🔜 Statystyki i analiza czasu pracy  
-- 🔜 Zestawienia pracy, przerw i ćwiczeń  
+- ✅ Liczenie czasu pracy i przerw
+- ✅ Odliczanie czasu do następnej przerwy
+- ✅ Polecanie ćwiczeń podczas przerw
+- ✅ Ustawienia: sugerowany czas przerwy, lista ćwiczeń, włącz/wyłącz polecanie ćwiczeń
+- 🔜 Statystyki i analiza czasu pracy
+- 🔜 Zestawienia pracy, przerw i ćwiczeń
 
 ## 🛠️ Wykorzystane technologie
 
@@ -34,11 +34,12 @@ W ustawieniach możesz spersonalizować częstotliwość przerw oraz rodzaj prop
 ## 🧭 Plan rozwoju
 
 W kolejnych wersjach planowane jest:
-- dodanie panelu ustawień i personalizacji przerw,  
-- wprowadzenie modułu ćwiczeń z grafikami lub animacjami,  
-- rozwinięcie statystyk z wizualizacją danych,  
-- eksport danych do plików (CSV / PDF),  
-- ? możliwość synchronizacji między urządzeniami.  
+
+- dodanie panelu ustawień i personalizacji przerw,
+- wprowadzenie modułu ćwiczeń z grafikami lub animacjami,
+- rozwinięcie statystyk z wizualizacją danych,
+- eksport danych do plików (CSV / PDF),
+- ? możliwość synchronizacji między urządzeniami.
 
 ## 🚀 Uruchamianie projektu lokalnie
 
