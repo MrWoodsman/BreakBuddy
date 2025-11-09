@@ -441,7 +441,6 @@ function App() {
 
   const exerciseDone = (data) => {
     let now = Date.now()
-    console.log(data, now)
     todayData.exercisesData
 
     setTodayData(prevData => ({
