@@ -325,28 +325,21 @@ function App() {
 
   // Rozpoczynanie przerwy
   const startBreak = useCallback(() => {
-    // 1. Sprawdzenie (bez zmian, ale czytelniej)
     if (appStateRef.current !== "WORKING") return;
 
-    // 2. Ustawiamy stan aplikacji (to jest bezpieczne)
     setAppState("BREAK");
 
-    // 3. Obliczamy JEDEN moment w czasie
-    const breakStartTime = Date.now(); // Użyjemy tego samego czasu dla obu akcji
+    const breakStartTime = Date.now();
 
-    // 4. Tworzymy nowy interwał przerwy
     const newBreakInterval = {
-      startTime: breakStartTime, // Przerwa zaczyna się DOKŁADNIE, gdy praca się kończy
+      startTime: breakStartTime,
       endTime: null,
       duration: null,
     };
 
-    // 5. Wykonujemy JEDNĄ, dużą aktualizację stanu
     setTodayData((prevTodayData) => {
-      // Strażnik na wypadek, gdyby dane były null
       if (!prevTodayData) return prevTodayData;
 
-      // === Logika z pierwszej aktualizacji (zakończenie pracy) ===
       const lastWorkInterval = prevTodayData.workData[prevTodayData.workData.length - 1];
       const workDuration = breakStartTime - lastWorkInterval.startTime;
 
@@ -354,22 +347,20 @@ function App() {
         if (index === prevTodayData.workData.length - 1) {
           return {
             ...interval,
-            endTime: breakStartTime, // Używamy naszego jednego czasu
+            endTime: breakStartTime,
             duration: workDuration,
           };
         }
         return interval;
       });
 
-      // === Logika z drugiej aktualizacji (rozpoczęcie przerwy) ===
       const newBreakData = [...prevTodayData.breakData, newBreakInterval];
 
-      // === Zwracamy JEDEN, kompletny, nowy obiekt stanu ===
       return {
         ...prevTodayData,
-        workData: updatedWorkData, // Zawiera zakończoną pracę
-        allWorkTime: prevTodayData.allWorkTime + workDuration, // Zawiera zaktualizowany czas
-        breakData: newBreakData, // Zawiera rozpoczętą przerwę
+        workData: updatedWorkData,
+        allWorkTime: prevTodayData.allWorkTime + workDuration,
+        breakData: newBreakData,
       };
     });
   }, []);
@@ -441,7 +432,6 @@ function App() {
 
   const exerciseDone = (data) => {
     let now = Date.now()
-    todayData.exercisesData
 
     setTodayData(prevData => ({
       ...prevData,
