@@ -4,6 +4,26 @@
 
 [![Pobierz dla Windows](https://img.shields.io/badge/Windows-Download-blue?logo=windows&style=for-the-badge)](https://github.com/MrWoodsman/BreakBuddy/releases/download/v1.0.0/BreakBuddy-1.0.0.Setup.exe) [![Pobierz dla macOS](https://img.shields.io/badge/macOS-Download-grey?logo=apple&style=for-the-badge)](https://github.com/MrWoodsman/BreakBuddy/releases/download/v1.0.0/BreakBuddy-1.0.0-arm64.dmg)
 
+---
+
+### ⚠️ Ważna informacja dla użytkowników macOS
+
+Po pobraniu aplikacji, system macOS może wyświetlić błędny komunikat "Rzecz 'BreakBuddy' jest uszkodzona i nie można jej otworzyć".
+
+**Aplikacja nie jest uszkodzona.** Jest to błąd wynikający z polityki bezpieczeństwa Apple (Gatekeeper), która blokuje niepodpisane aplikacje.
+
+**Aby to naprawić (wystarczy zrobić raz):**
+
+1.  Po pobraniu, przenieś plik `BreakBuddy.app` do folderu `Aplikacje`.
+2.  Otwórz aplikację **Terminal**.
+3.  Wklej i uruchom poniższą komendę (aby usunąć flagę kwarantanny):
+    ```bash
+    xattr -cr /Applications/BreakBuddy.app
+    ```
+4.  Po wykonaniu komendy, aplikacja będzie uruchamiać się normalnie.
+
+---
+
 Aplikacja desktopowa działająca na **Windows** i **macOS**, która pomaga śledzić czas pracy oraz przypomina o przerwach.  
 Podczas przerw proponuje krótkie ćwiczenia, które pomagają zadbać o zdrowie i efektywność.
 
