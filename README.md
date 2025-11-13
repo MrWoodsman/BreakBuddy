@@ -2,7 +2,7 @@
 
 ### ⬇️ Pobierz aplikację
 
-[![Pobierz dla Windows](https://img.shields.io/badge/Windows-Download-blue?logo=windows&style=for-the-badge)](https://github.com/MrWoodsman/BreakBuddy/releases/download/v1.0.0/BreakBuddy-1.0.0.Setup.exe) [![Pobierz dla macOS](https://img.shields.io/badge/macOS-Download-grey?logo=apple&style=for-the-badge)](https://github.com/MrWoodsman/BreakBuddy/releases/download/v1.0.0)
+[![Pobierz dla Windows](https://img.shields.io/badge/Windows-Download-blue?logo=windows&style=for-the-badge)](https://github.com/MrWoodsman/BreakBuddy/releases/download/v1.0.0/BreakBuddy-1.0.0.Setup.exe) [![Pobierz dla macOS](https://img.shields.io/badge/macOS-Download-grey?logo=apple&style=for-the-badge)](https://github.com/MrWoodsman/BreakBuddy/releases/download/v1.0.0/BreakBuddy-1.0.0-arm64.dmg)
 
 Aplikacja desktopowa działająca na **Windows** i **macOS**, która pomaga śledzić czas pracy oraz przypomina o przerwach.  
 Podczas przerw proponuje krótkie ćwiczenia, które pomagają zadbać o zdrowie i efektywność.
