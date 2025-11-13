@@ -45,10 +45,10 @@ W kolejnych wersjach planowane jest:
 
 ```bash
 # 1. Sklonuj repozytorium
-git clone https://github.com/uzytkownik/licznik-czasu-pracy.git
+git clone https://github.com/MrWoodsman/BreakBuddy.git
 
 # 2. Przejdź do folderu projektu
-cd licznik-czasu-pracy
+cd BreakBuddy
 
 # 3. Zainstaluj zależności
 npm install
